@@ -208,10 +208,46 @@ deseason_inflow_data <- detrend_inflow_data - season_inflow_data
 #convert to ts
 ts_deseason_inflow_data <- ts(deseason_inflow_data, start = c(1931, 1), frequency = 12)
 
+ts_season <- ts(season_inflow_data, start = c(1931, 1), frequency = 12)
+
 #plots
 autoplot(ts_inflow_data[,iHP]) + 
-  autolayer(ts_deseason_inflow_data, series = "Detrend and Deseasoned Inflow")
+  #autolayer(ts_deseason_inflow_data, series = "Detrend and Deseasoned Inflow")
+  autolayer(ts_season, series = "Seasonal Component")
 ```
+
+```{r}
+wooclap_linear_trend_model <- lm(inflow_data[,8+1]~t)
+summary(wooclap_linear_trend_model)
+
+#Store reg coefficient
+wooclap_beta1 <- as.numeric(wooclap_linear_trend_model$coefficients[2]) #slope
+
+print(wooclap_beta1)
+```
+
+```{r}
+#Fit a linear trend to TS of iHP
+wooclap_linear_trend_model <- lm(inflow_data[,3+1]~t)
+
+#Store reg coefficient
+wooclap_beta0 <- as.numeric(wooclap_linear_trend_model$coefficients[1]) #intercept
+wooclap_beta1 <- as.numeric(wooclap_linear_trend_model$coefficients[2]) #slope
+
+#remove the trend from series
+wooclap_detrend_inflow_data <- inflow_data[,3 + 1] - (wooclap_beta0 + (wooclap_beta1 * t))
+class(wooclap_detrend_inflow_data)
+
+#Transform to time series
+wooclap_ts_detrend_inflow <- ts(wooclap_detrend_inflow_data, frequency = 12, start = c(1931, 1))
+
+wooclap_dummies <- seasonaldummy(wooclap_ts_detrend_inflow)
+
+wooclap_seas_means_model <- lm(wooclap_detrend_inflow_data~wooclap_dummies)
+
+summary(wooclap_seas_means_model)
+```
+
 
 ##Exercise
 
