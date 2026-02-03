@@ -227,8 +227,8 @@ for (i in 1:nobs) {
   hc_season_comp[i] <- hc_beta_int + hc_beta_coeff%*%hc_dummies[i,]
 }
 
-trp_deseasoned <- trp_detrended - trp_season_comp
-hc_deseasoned <- hc_detrended - hc_season_comp
+trp_deseasoned <- energy_ts[, 1] - trp_season_comp
+hc_deseasoned <- energy_ts[, 2] - hc_season_comp
 
 autoplot(energy_ts[, 1]) + 
   autolayer(trp_deseasoned, series = "Deseasoned Total Renewable Energy Production")
@@ -237,8 +237,32 @@ autoplot(energy_ts[, 2]) +
   autolayer(hc_deseasoned, series = "Deseasoned Hydroelectric Power Consumption")
 ```
 
-> Answer: 
+> Answer: The overall trends are the same but the short-term peaks and troughs are not as extreme.
 
 ### Q9
 
 Plot ACF and PACF for the deseason series and compare with the plots from Q1. You may use plot_grid() again to get them side by side. Did the plots change? How?
+
+```{r}
+trp_deseasoned_acf <- ggAcf(trp_deseasoned, lag.max = 40, plot = TRUE) + 
+  ggtitle(paste("Deseasoned Total Renewable Energy Production ACF")) +
+  theme_minimal()
+
+trp_deseasoned_pacf <- ggPacf(trp_deseasoned, lag.max = 40, plot = TRUE) + 
+  ggtitle(paste("Deseasoned Total Renewable Energy Production PACF")) +
+  theme_minimal()
+
+plot_grid(trp_deseasoned_acf, trp_deseasoned_pacf, nrow = 1)
+
+hc_deseasoned_acf <- ggAcf(hc_deseasoned, lag.max = 40, plot = TRUE) + 
+  ggtitle(paste("Deseasoned Hydroelectric Power Consumption ACF")) +
+  theme_minimal()
+
+hc_deseasoned_pacf <- ggPacf(hc_deseasoned, lag.max = 40, plot = TRUE) + 
+  ggtitle(paste("Deseasoned Hydroelectric Power Consumption PACF")) +
+  theme_minimal()
+
+plot_grid(hc_deseasoned_acf, hc_deseasoned_pacf, nrow = 1)
+```
+
+> Answer: The deseasnoned Total Renewable Energy Production ACF looks the same as the original, while the deseasoned PACF has values with absolute values that are lower than those in the original. The deseasoned Hydroelectric Power Consumption ACF has looks to be nearly continually decreasing with some extra component that is roughly a sigmoid, this is in contrast to the original which looks more like a sigmoid with some steadily decreasing component (difference is in the strength of the sigmoid component vs the steadily decreasing component). The deseasoned Hydroelectric Power Consumption PACF has values with absolute values that are lower than those in the original.
