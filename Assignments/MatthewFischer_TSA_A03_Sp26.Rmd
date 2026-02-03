@@ -274,7 +274,7 @@ hc_deseasoned_acf <- ggAcf(hc_deseasoned, lag.max = 40, plot = TRUE) +
 hc_deseasoned_pacf <- ggPacf(hc_deseasoned, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Deseasoned Hydroelectric Power Consumption PACF")) +
   theme_minimal() + 
-  theme(plot.title = element_text(size = 7))
+  theme(plot.title = element_text(size = ))
 
 plot_grid(hc_deseasoned_acf, hc_deseasoned_pacf, nrow = 1)
 ```
