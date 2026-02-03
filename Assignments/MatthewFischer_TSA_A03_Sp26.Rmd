@@ -46,9 +46,9 @@ library("readxl")
 library(ggplot2)
 library(cowplot)
 
-energy_data <- read_excel(path="./Data/Table_10.1_Renewable_Energy_Production_and_Consumption_by_Source.xlsx",skip = 12, sheet="Monthly Data",col_names=FALSE)
+energy_data <- read_excel(path="../Data/Table_10.1_Renewable_Energy_Production_and_Consumption_by_Source.xlsx",skip = 12, sheet="Monthly Data",col_names=FALSE)
 
-read_col_names <- read_excel(path="./Data/Table_10.1_Renewable_Energy_Production_and_Consumption_by_Source.xlsx",skip = 10,n_max = 1, sheet="Monthly Data",col_names=FALSE) 
+read_col_names <- read_excel(path="../Data/Table_10.1_Renewable_Energy_Production_and_Consumption_by_Source.xlsx",skip = 10,n_max = 1, sheet="Monthly Data",col_names=FALSE) 
 
 colnames(energy_data) <- read_col_names
 
@@ -77,29 +77,35 @@ For each series (Total Renewable Production and Hydroelectric Consumption) creat
 ```{r}
 trp_ts <- autoplot(energy_ts[, 1], lag.max = 40, plot = TRUE) +
   ggtitle(paste("Total Renewable Energy Production Time Series")) +
-  xlab("Year") + ylab("Total Renewable Energy Production")
+  xlab("Year") + ylab("Total Renewable Energy Production") + 
+  theme(plot.title = element_text(size = 5))
 
 trp_acf <- ggAcf(energy_ts[, 1], lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Total Renewable Energy Production ACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 5))
 
 trp_pacf <- ggPacf(energy_ts[, 1], lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Total Renewable Energy Production PACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 5))
 
 plot_grid(trp_ts, trp_acf, trp_pacf, nrow = 1)
 
 hc_ts <- autoplot(energy_ts[, 2], lag.max = 40, plot = TRUE) +
-  ggtitle(paste("Hydroelectric Consumption Time Series")) +
-  xlab("Year") + ylab("Hydroelectric Consumption")
+  ggtitle(paste("Hydroelectric Power Consumption Time Series")) +
+  xlab("Year") + ylab("Hydroelectric Power Consumption") + 
+  theme(plot.title = element_text(size = 5))
 
 hc_acf <- ggAcf(energy_ts[, 2], lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Hydroelectric Power Consumption ACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 5))
 
 hc_pacf <- ggPacf(energy_ts[, 2], lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Hydroelectric Power Consumption PACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 5))
 
 plot_grid(hc_ts, hc_acf, hc_pacf, nrow = 1)
 ```
@@ -156,21 +162,25 @@ Plot ACF and PACF for the detrended series and compare with the plots from Q1. Y
 ```{r}
 trp_detrended_acf <- ggAcf(trp_detrended, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Detrended Total Renewable Energy Production ACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 trp_detrended_pacf <- ggPacf(trp_detrended, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Detrended Total Renewable Energy Production PACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 plot_grid(trp_detrended_acf, trp_detrended_pacf, nrow = 1)
 
 hc_detrended_acf <- ggAcf(hc_detrended, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Detrended Hydroelectric Power Consumption ACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 hc_detrended_pacf <- ggPacf(hc_detrended, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Detrended Hydroelectric Power Consumption PACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 plot_grid(hc_detrended_acf, hc_detrended_pacf, nrow = 1)
 ```
@@ -246,21 +256,25 @@ Plot ACF and PACF for the deseason series and compare with the plots from Q1. Yo
 ```{r}
 trp_deseasoned_acf <- ggAcf(trp_deseasoned, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Deseasoned Total Renewable Energy Production ACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 trp_deseasoned_pacf <- ggPacf(trp_deseasoned, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Deseasoned Total Renewable Energy Production PACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 plot_grid(trp_deseasoned_acf, trp_deseasoned_pacf, nrow = 1)
 
 hc_deseasoned_acf <- ggAcf(hc_deseasoned, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Deseasoned Hydroelectric Power Consumption ACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 hc_deseasoned_pacf <- ggPacf(hc_deseasoned, lag.max = 40, plot = TRUE) + 
   ggtitle(paste("Deseasoned Hydroelectric Power Consumption PACF")) +
-  theme_minimal()
+  theme_minimal() + 
+  theme(plot.title = element_text(size = 7))
 
 plot_grid(hc_deseasoned_acf, hc_deseasoned_pacf, nrow = 1)
 ```
