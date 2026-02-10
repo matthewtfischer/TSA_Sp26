@@ -39,7 +39,7 @@ Today we will work with wind speed data.
 ```{r}
 
 #Importing time series data from text file#
-wind_data <- read.csv(file="./Data/Wind_Speed_PortArthurTX_Processed.csv",header=TRUE,stringsAsFactors = TRUE)
+wind_data <- read.csv(file="../Data/Wind_Speed_PortArthurTX_Processed.csv",header=TRUE,stringsAsFactors = TRUE)
 
 #creating data object
 wind_data$DATE <- ym(wind_data$DATE)
