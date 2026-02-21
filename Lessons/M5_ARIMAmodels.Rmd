@@ -127,19 +127,19 @@ The ACF and PACF from the seasonal adjusted series will help you specify compone
 ```{r}
 
 #Creating non-seasonal residential price time series
-deseasonal_residential_price <- 
+deseasonal_residential_price <- seasadj(decompose_residential_price)
   
 
 #Plotting original and deseasoned series
-autoplot()
+autoplot(decompose_residential_price)
 
 
 
 #Comparing ACFs
 plot_grid(
-  autoplot(Acf(????, lag = 40, plot=FALSE), 
+  autoplot(Acf(electricity_price_processed$Residential, lag = 40, plot=FALSE), 
                 main = "Orginal Residential Electricity Price"),
-  autoplot(Acf(????, lag = 40, plot=FALSE),  
+  autoplot(Acf(deseasonal_residential_price, lag = 40, plot=FALSE),  
                   main = "Deseason Residential Electricity Price")
 )
 
@@ -147,9 +147,9 @@ plot_grid(
 
 #Comparing PACFs
 plot_grid(
-  autoplot(Pacf(????, lag = 40, plot=FALSE), 
+  autoplot(Pacf(electricity_price_processed$Residential, lag = 40, plot=FALSE), 
                 main = "Orginal Residential Electricity Price"),
-  autoplot(Pacf(????, lag = 40, plot=FALSE),  
+  autoplot(Pacf(deseasonal_residential_price, lag = 40, plot=FALSE),  
                   main = "Deseason Residential Electricity Price")
 )
 
@@ -164,32 +164,31 @@ Always check for stationarity before fitting ARIMA models. This will help specif
 ```{r}
 
 #Run ADF
-
+print(adf.test(deseasonal_residential_price, alternative = "stationary"))
 
 #Lets difference the series to remove the trend.
 #Difference the data at lag 1 and remove NA
-deseasonal_residential_price_diff <- 
-
+deseasonal_residential_price_diff <- diff(deseasonal_residential_price, lag = 1)
 #Check autocorrelation plot again
-
+autoplot(deseasonal_residential_price_diff)
 
 #Comparing ACFs
 plot_grid(
-  autoplot(Acf(????, lag = 40, plot=FALSE), 
+  autoplot(Acf(electricity_price_processed$Residential, lag = 40, plot=FALSE), 
                 main = "Orginal Residential Electricity Price"),
-  autoplot(Acf(????, lag = 40, plot=FALSE),  
+  autoplot(Acf(deseasonal_residential_price, lag = 40, plot=FALSE),  
                   main = "Deseason Residential Electricity Price"),
-  autoplot(Acf(????, lag = 40, plot=FALSE),  
+  autoplot(Acf(deseasonal_residential_price_diff, lag = 40, plot=FALSE),  
                   main = "Diff/Deseason Residential Electricity Price")
 )
 
 #Comparing PACFs
 plot_grid(
-  autoplot(Pacf(????, lag = 40, plot=FALSE), 
+  autoplot(Pacf(electricity_price_processed$Residential, lag = 40, plot=FALSE), 
                 main = "Orginal Residential Electricity Price"),
-  autoplot(Pacf(????, lag = 40, plot=FALSE),  
+  autoplot(Pacf(deseasonal_residential_price, lag = 40, plot=FALSE),  
                   main = "Deseason Residential Electricity Price"),
-  autoplot(Oacf(????, lag = 40, plot=FALSE),  
+  autoplot(Oacf(deseasonal_residential_price_diff, lag = 40, plot=FALSE),  
                   main = "Diff/Deseason Residential Electricity Price")
 )
 ```
@@ -209,33 +208,45 @@ Some important arguments for Arima() are:
 
 #Remember the order d=1 will perform the differencing, 
 #so lets try ARIMA(1,1,1) on the non-seasonal residential data before differencing
-Model_111 <- Arima()
+Model_111 <- Arima(deseasonal_residential_price, order = c(1,1,1), include.drift = TRUE)
 print(Model_111)
+checkresiduals(Model_111)
 compare_aic <- data.frame(Model_111$aic)
 
 #Check residuals series, if white noise we got a good fit
 plot_grid(
   autoplot(Model_111$residuals),
-  autoplot(Acf(Model_111$residuals,lag.max=40, plot = FALSE),
-  Pacf(Model_111$residuals,lag.max=40),
+  autoplot(Acf(Model_111$residuals,lag.max=40, plot = FALSE)),
+  autoplot(Pacf(Model_111$residuals,lag.max=40, plot = FALSE))
 )
 
 #Now let's try ARIMA(0,1,1)
-
+Model_011 <- Arima(deseasonal_residential_price, order = c(0,1,1), include.drift = TRUE)
+print(Model_011)
+checkresiduals(Model_011)
+compare_aic <- data.frame(Model_011$aic)
 
 
 compare_aic <- data.frame(compare_aic,Model_011$aic)
 
 
 #Now let's try ARIMA(2,1,1)
-
-
-
+Model_211 <- Arima(deseasonal_residential_price, order = c(2,1,1), include.drift = TRUE)
+print(Model_211)
+checkresiduals(Model_211)
+compare_aic <- data.frame(Model_211$aic)
 
 #Now let's try ARIMA(1,1,2)
-
+Model_112 <- Arima(deseasonal_residential_price, order = c(1,1,2), include.drift = TRUE)
+print(Model_112)
+checkresiduals(Model_112)
+compare_aic <- data.frame(Model_112$aic)
 
 #Now let's try ARIMA(2,1,2)
+Model_212 <- Arima(deseasonal_residential_price, order = c(2,1,2), include.drift = TRUE)
+print(Model_212)
+checkresiduals(Model_212)
+compare_aic <- data.frame(Model_212$aic)
 
 #Let's check AIC
 print(compare_aic)
