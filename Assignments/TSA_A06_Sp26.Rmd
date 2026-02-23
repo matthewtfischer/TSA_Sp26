@@ -1,6 +1,6 @@
 ---
 title: "ENV 797 - Time Series Analysis for Energy and Environment Applications | Spring 2026"
-subtitle: "Assignment 6 - Due date 03/03/26"
+subtitle: "Assignment 6 - Due date 02/27/26"
 author: "Student Name"
 output: pdf_document
 geometry: margin=2.54cm
