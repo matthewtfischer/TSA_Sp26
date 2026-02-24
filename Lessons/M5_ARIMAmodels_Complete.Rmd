@@ -309,7 +309,7 @@ How do you choose the best model?
 * Lowest AIC (or BIC if you prefer stronger penalty)
 * Fewest parameters
 * Stable and interpretable coefficients
-* And Forecast Performane (M7)
+* And Forecast Performance (M7)
 
 ## Automatically fitting ARIMA
 
