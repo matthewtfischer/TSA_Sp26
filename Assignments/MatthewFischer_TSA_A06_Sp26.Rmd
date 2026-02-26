@@ -77,31 +77,31 @@ autoplot(arma11) +
 
 
 ```{r}
-p1 <- ggAcf(arma10, lag.max = 40) +
+acf_10 <- ggAcf(arma10, lag.max = 40) +
   ggtitle("ACF: ARMA(1,0)")
 
-p2 <- ggAcf(arma01, lag.max = 40) +
+acf_01 <- ggAcf(arma01, lag.max = 40) +
   ggtitle("ACF: ARMA(0,1)")
 
-p3 <- ggAcf(arma11, lag.max = 40) +
+acf_11 <- ggAcf(arma11, lag.max = 40) +
   ggtitle("ACF: ARMA(1,1)")
 
-plot_grid(p1, p2, p3, ncol = 1)
+plot_grid(acf_10, acf_01, acf_11, ncol = 1)
 ```
 
 (c) Plot the sample PACF for each of these models in one window to facilitate comparison.
 
 ```{r}
-p1 <- ggPacf(arma10, lag.max = 40) +
+pacf_10 <- ggPacf(arma10, lag.max = 40) +
   ggtitle("PACF: ARMA(1,0)")
 
-p2 <- ggPacf(arma01, lag.max = 40) +
+pacf_01 <- ggPacf(arma01, lag.max = 40) +
   ggtitle("PACF: ARMA(0,1)")
 
-p3 <- ggPacf(arma11, lag.max = 40) +
+pacf_11 <- ggPacf(arma11, lag.max = 40) +
   ggtitle("PACF: ARMA(1,1)")
 
-plot_grid(p1, p2, p3, ncol = 1)
+plot_grid(pacf_10, pacf_01, pacf_11, ncol = 1)
 ```
 
 (d) Look at the ACFs and PACFs. Imagine you had these plots for a data set and you were asked to identify the model, i.e., is it AR, MA or ARMA and the order of each component. Would you be able identify them correctly? Explain your answer.
@@ -115,8 +115,45 @@ plot_grid(p1, p2, p3, ncol = 1)
 (f) Increase number of observations to $n=1000$ and repeat parts (b)-(e).
 
 ```{r}
+arma10_1000 <- arima.sim(
+  n = 1000,
+  model = list(ar = 0.6)
+)
 
+arma01_1000 <- arima.sim(
+  n = 1000,
+  model = list(ma = 0.9)
+)
+
+arma11_1000 <- arima.sim(
+  n = 1000,
+  model = list(ar = 0.6, ma = 0.9)
+)
+
+acf_10_1000 <- ggAcf(arma10_1000, lag.max = 40) +
+  ggtitle("ACF: ARMA(1,0)")
+
+acf_01_1000 <- ggAcf(arma01_1000, lag.max = 40) +
+  ggtitle("ACF: ARMA(0,1)")
+
+acf_11_1000 <- ggAcf(arma11_1000, lag.max = 40) +
+  ggtitle("ACF: ARMA(1,1)")
+
+plot_grid(acf_10_1000, acf_01_1000, acf_11_1000, ncol = 1)
+
+pacf_10_1000 <- ggPacf(arma10_1000, lag.max = 40) +
+  ggtitle("PACF: ARMA(1,0)")
+
+pacf_01_1000 <- ggPacf(arma01_1000, lag.max = 40) +
+  ggtitle("PACF: ARMA(0,1)")
+
+pacf_11_1000 <- ggPacf(arma11_1000, lag.max = 40) +
+  ggtitle("PACF: ARMA(1,1)")
+
+plot_grid(pacf_10_1000, pacf_01_1000, pacf_11_1000, ncol = 1)
 ```
+
+> Answer:
 
 ## Q3
 
