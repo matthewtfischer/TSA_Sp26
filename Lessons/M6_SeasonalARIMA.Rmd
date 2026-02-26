@@ -223,18 +223,31 @@ Look at the twice differenced series to identify model order.
 ## Manually fitting seasonal ARIMA to original series
 
 ```{r}
+Model_111_011 <- Arima(ts_electricity_price[,"Residential"],
+                      order = c(1, 1, 1),
+                      seasonal = c(0, 1, 1),
+                      include.drift = TRUE)
+print(Model_111_011)
+checkresiduals(Model_111_011)
+compare_aic <- data.frame(Model_111_011$aic)
 
+Model_011_011 <- Arima(ts_electricity_price[,"Residential"],
+                      order = c(0, 1, 1),
+                      seasonal = c(0, 1, 1),
+                      include.drift = TRUE)
 
-
+print(Model_011_011)
+checkresiduals(Model_011_011)
+compare_aic <- data.frame(compare_aic, Model_011_011$aic)
 ```
 
 ## Automatically fitting seasonal ARIMA to original series
 
 ```{r}
-
-
-
-
+Model_autofit <- auto.arima(ts_electricity_price[,"Residential"],
+                            approximation = TRUE)
+print(Model_autofit)
+compare_aic <- cbind(compare_aic, Model_autofit$aic)
 ```
 
 
@@ -243,9 +256,16 @@ Look at the twice differenced series to identify model order.
 Recall from M6 that the best fit for the non-seasonal time series is a ARIMA(1,1,2) with drift.
 
 ```{r}
-
+Model_autofit_nonseas <- auto.arima(deseasonal_residential_price,
+                                    max.D = 0,
+                                    max.P = 0,
+                                    max.Q = 0,
+                                    approximation = TRUE)
+print(Model_autofit_nonseas)
+compare_aic <- cbind(compare_aic, Model_autofit_nonseas$aic)
 
 
 ```
 
 ## Discussion: Which one to do? ARIMA or SARIMA?
+SARIMA on original series.
