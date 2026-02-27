@@ -107,11 +107,11 @@ plot_grid(pacf_10, pacf_01, pacf_11, ncol = 1)
 
 (d) Look at the ACFs and PACFs. Imagine you had these plots for a data set and you were asked to identify the model, i.e., is it AR, MA or ARMA and the order of each component. Would you be able identify them correctly? Explain your answer.
 
-> Answer:
+> Answer: ARMA(1,0) would not be very hard to identify as AR(1) as the ACF decreases gradually and the PACF cuts off after lag = 1. ARMA(0,1) would also not be very hard to identify as MA(1) as the ACF cuts off after lag = 1 and the PACF gradually decreases. ARMA(1,1) would be harder to identify since the ACF and PACF both tail off, making it hard to tell if it's ARMA or a higher-order AR or MA process.
 
 (e) Compare the PACF values R computed with the values you provided for the lag 1 correlation coefficient, i.e., does $\phi=0.6$ match what you see on PACF for ARMA(1,0), and ARMA(1,1)? Should they match?
 
-> Answer:
+> Answer: For ARMA(1,0), the PACF value at lag 1 is very close to 0.6 but not exactly. For ARMA(1,1), the PACF value at lag 1 is farther away, around 0.75. ARMA(1,0) should match, ARMA(1,1) likely would not due to the MA component.
 
 (f) Increase number of observations to $n=1000$ and repeat parts (b)-(e).
 
@@ -154,7 +154,7 @@ pacf_11_1000 <- ggPacf(arma11_1000, lag.max = 40) +
 plot_grid(pacf_10_1000, pacf_01_1000, pacf_11_1000, ncol = 1)
 ```
 
-> Answer:
+> Answer: It is now very easy to identify the patterns in all models, making ARMA(1,0) and ARMA(0,1) easy to identify while ARMA(1,1) wouls still be somewhat ambiguous. The PACF value at lag 1 is nearly equal to 0.6 for ARMA(1,0) and 0.75 for ARMA(1,1).
 
 ## Q3
 
@@ -162,21 +162,43 @@ Consider the ARIMA model $y_t=0.7*y_{t-1}-0.25*y_{t-12}+a_t-0.1*a_{t-1}$
 
 (a) Identify the model using the notation ARIMA$(p,d,q)(P,D,Q)_ s$, i.e., identify the integers $p,d,q,P,D,Q,s$ (if possible) from the equation.
 
+> Answer: p = 1, d = 0, q = 1, P = 1, D = 0, Q = 0. So the model is ARIMA(1,0,1)(1,0,0)
+
 (b) Also from the equation what are the values of the parameters, i.e., model coefficients.
+
+> Answer: The non-seasonal AR_1 coefficient (phi_1) is 0.7, the non-seasonal MA_1 coefficient (theta_1) is -0.1, and the seasonal AR_1 coefficient (capital phi_1) is -0.25.
 
 ## Q4
 
-Simulate a seasonal ARIMA$(0, 1)\times(1, 0)_{12}$ model with $\phi =0 .8$ and $\theta = 0.5$ using the `sim_sarima()` function from package `sarima`. The $12$ after the bracket tells you that $s=12$, i.e., the seasonal lag is 12, suggesting monthly data whose behavior is repeated every 12 months. You can generate as many observations as you like. Note the Integrated part was omitted. It means the series do not need differencing, therefore $d=D=0$. Plot the generated
-series using `autoplot()`. Does it look seasonal?
+Simulate a seasonal ARIMA$(0, 1)\times(1, 0)_{12}$ model with $\phi =0 .8$ and $\theta = 0.5$ using the `sim_sarima()` function from package `sarima`. The $12$ after the bracket tells you that $s=12$, i.e., the seasonal lag is 12, suggesting monthly data whose behavior is repeated every 12 months. You can generate as many observations as you like. Note the Integrated part was omitted. It means the series do not need differencing, therefore $d=D=0$. Plot the generated series using `autoplot()`. Does it look seasonal?
 
 ```{r}
+sim_data <- sim_sarima(
+  n = 240,
+  model = list(ma = 0.5, sar = 0.8),
+  S = 12
+)
 
+sim_ts <- ts(sim_data, frequency = 12)
+
+autoplot(sim_ts) +
+  ggtitle("Simulated SARIMA (0,1)x(1,0)[12]") +
+  xlab("Time") +
+  ylab("Value")
 ```
+> Answer: The data do look seasonal although there is a lot of noise as well that makes them look messy.
 
 ## Q5
 
 Plot ACF and PACF of the simulated series in Q4. Comment if the plots are well representing the model you simulated, i.e., would you be able to identify the order of both non-seasonal and seasonal components from the plots? Explain.
 
 ```{r}
+acf_01_x_10 <- ggAcf(sim_ts, lag.max = 48) +
+  ggtitle("ACF: SARIMA (0,1)x(1,0)[12]")
 
+pacf_01_x_10 <- ggPacf(sim_ts, lag.max = 48) +
+  ggtitle("PACF: SARIMA (0,1)x(1,0)[12]")
+
+plot_grid(acf_01_x_10, pacf_01_x_10, ncol = 1)
 ```
+> Answer: There is a large spike at lag = 1 in the ACF which corresponds to MA(1) and the ACF cuts off after that with only a couple other significant points. There do not seem to be very noticeable values around lags = multiples of 12 (seasonal AR) which is not something I would expect. For the PACF, there is no sharp cutoff at lag = 1 (MA(1)) and it tails off after that, there do not seem to be spikes at lag = 12 (seaosnal AR(1)) which is not something I would expect. It does not look like the plots are entirely representative of the model I simulated.
