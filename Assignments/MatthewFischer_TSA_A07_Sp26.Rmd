@@ -24,6 +24,9 @@ Packages needed for this assignment: "forecast","tseries". Do not forget to load
 #Load/install required package here
 library(forecast)
 library(tseries)
+library(ggplot2)
+library(Kendall)
+library(cowplot)
 ```
 
 ## Importing and processing the data set
@@ -99,7 +102,7 @@ plot_grid(gg_deseasonalized_natural_gas, deseasonalized_natural_gas_acf, deseaso
 Run the ADF test and Mann Kendall test on the deseasonalized data from Q2. Report and explain the results.
 
 ```{r}
-print("Results for ADF test/n")
+print("Results for ADF test\n")
 print(adf.test(deseasonalized_natural_gas, alternative = "stationary"))
 
 print("Results for Mann Kendall")
@@ -111,20 +114,16 @@ print(summary(MannKendall(deseasonalized_natural_gas)))
 
 Using the plots from Q2 and test results from Q3 identify the ARIMA model parameters $p,d$ and $q$. Note that in this case because you removed the seasonal component prior to identifying the model you don't need to worry about seasonal component. Clearly state your criteria and any additional function in R you might use. DO NOT use the $auto.arima()$ function. You will be evaluated on ability to understand the ACF/PACF plots and interpret the test results.
 
-```{r}
-diff_deseas_natural_gas <- diff(deseasonalized_natural_gas)
-
-ggAcf(diff_deseas_natural_gas, lag.max = 40)
-ggPacf(diff_deseas_natural_gas, lag.max = 40)
-```
-> Answer: The deseasonalized time series has a strong positive trend, the ACF decays slowly, and the the Mann-Kendall test has a significant p-value, so d = 1. 
+> Answer: We reject the null hypothesis of the ADF test, which means that d = 0. The ACF decays slowly while the PACF cuts off after lag = 1, this means that p = 1 and q = 0. ARIMA(1,0,0)
 
 ### Q5
 
 Use `Arima()` from package "forecast" to fit an ARIMA model to your series considering the order estimated in Q4. You should allow constants in the model, i.e., `include.mean = TRUE` or `include.drift=TRUE`. **Print the coefficients** in your report. Hint: use the `cat()` or `print()` function to print.
 
 ```{r}
-
+arima_deseasonalized_natural_gas <- Arima(deseasonalized_natural_gas, 
+                                          order = c(1, 0, 0), include.mean = TRUE)
+print(arima_deseasonalized_natural_gas$coef)
 ```
 
 ### Q6
@@ -132,9 +131,9 @@ Use `Arima()` from package "forecast" to fit an ARIMA model to your series consi
 Now plot the residuals of the ARIMA fit from Q5 along with residuals ACF on the same window. You may use the $checkresiduals()$ function to get the plots. Do the residual series look like a white noise series? Why?
 
 ```{r}
-
+checkresiduals(arima_deseasonalized_natural_gas)
 ```
-
+> Answer: The residual series do not look like a white noise series since the residual plot does not seem to have constant variance, the residual ACF plot shows multiple significant spikes, and the Ljung-Box test has a statistically significant p-value.
 
 ## Modeling the original series (with seasonality)
 
@@ -143,28 +142,51 @@ Now plot the residuals of the ARIMA fit from Q5 along with residuals ACF on the 
 Repeat Q3-Q6 for the original series (the complete series that has the seasonal component). Note that when you model the seasonal series, you need to specify the seasonal part of the ARIMA model as well, i.e., $P$, $D$ and $Q$.
 
 ```{r}
-print("Results for ADF test/n")
+print("Results for ADF test\n")
 print(adf.test(natural_gas_ts, alternative = "stationary"))
 
 SMKtest <- SeasonalMannKendall(natural_gas_ts)
-print("Results for Seasonal Mann Kendall /n")
+print("Results for Seasonal Mann Kendall\n")
 print(summary(SMKtest))
 
-diff_natural_gas <- diff(natural_gas_ts)
+seasonal_differenced_natural_gas <- diff(natural_gas_ts, lag = 12)
+plot(seasonal_differenced_natural_gas)
 
-ggAcf(diff_natural_gas, lag.max = 40)
-ggPacf(diff_natural_gas, lag.max = 40)
+print("Results for ADF test on seasonal differenced series\n")
+print(adf.test(seasonal_differenced_natural_gas, alternative = "stationary"))
+
+gg_seasonal_differenced_natural_gas <- autoplot(seasonal_differenced_natural_gas) +
+  ggtitle(paste("Seasonal Differenced Natural Gas Generation")) +
+  xlab("Year") + ylab("Natural Gas Net Generation (Thousand MWh)") +
+  theme(plot.title = element_text(size = 5))
+
+seasonal_differenced_natural_gas_acf <- ggAcf(seasonal_differenced_natural_gas, lag.max = 40) +
+  ggtitle(paste("Seasonal Differenced Natural Gas ACF")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 5))
+
+seasonal_differenced_natural_gas_pacf <- ggPacf(seasonal_differenced_natural_gas, lag.max = 40) +
+  ggtitle(paste("Seasonal Differenced Natural Gas PACF")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 5))
+
+plot_grid(gg_seasonal_differenced_natural_gas, seasonal_differenced_natural_gas_acf, seasonal_differenced_natural_gas_pacf, nrow = 1)
+
+arima_seasonal_differenced_natural_gas <- Arima(natural_gas_ts, 
+                                          order = c(1, 0, 0), seasonal = c(0,1,1), 
+                                          include.mean = TRUE)
+
+print(arima_seasonal_differenced_natural_gas$coef)
+
+checkresiduals(arima_seasonal_differenced_natural_gas)
 ```
-> Answer: The ADF test has a p-value < 0.01, so there is strong enough that there is no stochastic trend. The seasonal Mann-Kendall test has a positive tau value and a very small p-value, so there is strong evidence of a significant positive trend.
+> Answer: The ADF test has a p-value < 0.01, so there is strong enough that there is no stochastic trend. The seasonal Mann-Kendall test has a positive tau value and a very small p-value, so there is strong evidence of a significant positive trend. The ACF shows spikes at multiples of 12, so D = 1 and the series needs seasonal differencing. The ADF test on the seasonal differenced series has a p-value < 0.01, so there is strong enough that there is no stochastic trend and d = 0. At non-seasonal lags, the ACF tails off while the PACF cuts off after lag = 1, meaning p = 1 and q = 0. At seasonnal lags, there is a negative spike in both the ACF and PACF, so P = 0 and Q = 1. ARIMA(1,0,0)x(0,1,1). The residual series do not look like white noise since the residual plot does not seem to have constant variance, the residual ACF plot shows 2 significant spikes, and the Ljung-Box test has a just barely statistically significant p-value.
 
 ### Q8
 
 Compare the residual series for Q7 and Q6. Can you tell which ARIMA model is better representing the Natural Gas Series? Is that a fair comparison? Explain your response.
 
-```{r}
-
-```
-
+> Answer: Both residual series show some remaining autocorrelation and the Ljung–Box tests are statistically significant, indicating that neither model produces perfect white noise residuals. The SARIMA model is likely better though since the p-value is much higher and there are less significant spikes in the residual ACF. This is not a fair comparison because you cannot directly compare ARIMA on deseasonalized series with SARIMA on original series because they are modeling different dependent variables.
 
 ## Checking your model with the auto.arima()
 
@@ -182,7 +204,7 @@ auto_fit <- auto.arima(
 
 print(auto_fit)
 ```
-
+> Answer: The best ARIMA model is (1,1,1), this does not match what I specified in Q4.
 
 ### Q10
 
@@ -196,4 +218,4 @@ auto_fit <- auto.arima(
 
 print(auto_fit)
 ```
-
+> Answer: Here the model parameters match what I specified in Q7.
