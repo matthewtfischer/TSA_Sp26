@@ -130,7 +130,7 @@ ts_price_test <- subset(ts_electricity_price,
 #no need to make obs_2020 a ts object
 
 #If you not sure what we did here comment the following lines and check the values/dates
-tail(ts_price,12)
+tail(ts_price_train,12)
 
 
 ```
