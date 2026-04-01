@@ -215,7 +215,7 @@ auto_fit <- auto.arima(
   natural_gas_ts,
   seasonal = TRUE
 )
-#random check
+
 print(auto_fit)
 ```
 > Answer: Here the model parameters match what I specified in Q7.
