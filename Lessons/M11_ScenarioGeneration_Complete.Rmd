@@ -52,7 +52,7 @@ for(i in 1:nvar){
   X[i,]=rnorm(nscen,mean=0,sd=1)   
 }
 
-# Alternatively, if you are not a big fun of loops you could do this three times.
+# Alternatively, if you are not a big fan of loops you could do this three times.
 #X[1,]=rnorm(nscen,mean=0,sd=1)  
 #X[2,]=rnorm(nscen,mean=0,sd=1)  
 #X[3,]=rnorm(nscen,mean=0,sd=1)  
